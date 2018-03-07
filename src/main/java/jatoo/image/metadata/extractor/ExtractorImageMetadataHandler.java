@@ -39,14 +39,15 @@ import jatoo.image.ImageMetadataHandler;
  * ExifTool {@link ImageMetadataHelper} implementation.
  * 
  * @author <a href="http://cristian.sulea.net" rel="author">Cristian Sulea</a>
- * @version 1.1, March 2, 2018
+ * @version 1.2, March 7, 2018
  */
 public class ExtractorImageMetadataHandler extends ImageMetadataHandler {
 
   /** The logger. */
   private static final Log logger = LogFactory.getLog(ExtractorImageMetadataHandler.class);
 
-  private static String NOT_IMPLEMENTED_EXCEPTION_TEXT = "method not implemented, or operation not supported";
+  //
+  //
 
   @Override
   public ImageMetadata getMetadata(File image) {
@@ -55,18 +56,19 @@ public class ExtractorImageMetadataHandler extends ImageMetadataHandler {
 
     try {
 
-      Metadata xxx = ImageMetadataReader.readMetadata(image);
-      Directory directory = xxx.getFirstDirectoryOfType(ExifIFD0Directory.class);
+      Metadata m = ImageMetadataReader.readMetadata(image);
+      Directory directory = m.getFirstDirectoryOfType(ExifIFD0Directory.class);
 
       if (directory != null) {
 
-        metadata.setOrientation("" + directory.getInt(ExifIFD0Directory.TAG_ORIENTATION));
         metadata.setDateTaken(directory.getDate(ExifIFD0Directory.TAG_DATETIME, TimeZone.getDefault()));
+        metadata.setOrientation(directory.getInt(ExifIFD0Directory.TAG_ORIENTATION));
+        metadata.setOrientationText(getOrientationText(metadata.getOrientation()));
       }
     }
 
     catch (ImageProcessingException | IOException | MetadataException e) {
-      logger.error("could not get orientation", e);
+      logger.error("could not get metadata", e);
     }
 
     return metadata;
@@ -74,13 +76,47 @@ public class ExtractorImageMetadataHandler extends ImageMetadataHandler {
 
   @Override
   public boolean copyMetadata(File srcImage, File dstImage) {
-    throw new IllegalStateException(NOT_IMPLEMENTED_EXCEPTION_TEXT);
+    throw new IllegalStateException(getNotImplementedExceptionText());
   }
 
   @Override
   public boolean removeMetadata(File image) {
-    throw new IllegalStateException(NOT_IMPLEMENTED_EXCEPTION_TEXT);
+    throw new IllegalStateException(getNotImplementedExceptionText());
   }
+
+  //
+  //
+
+  @Override
+  public Date getDateTaken(File image) {
+
+    try {
+      Metadata metadata = ImageMetadataReader.readMetadata(image);
+      Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+
+      if (directory != null) {
+        return directory.getDate(ExifIFD0Directory.TAG_DATETIME, TimeZone.getDefault());
+      }
+    }
+
+    catch (ImageProcessingException | IOException e) {
+      logger.error("could not get date taken", e);
+    }
+
+    return null;
+  }
+
+  @Override
+  public boolean setDateTaken(File image, Date date) {
+    throw new IllegalStateException(getNotImplementedExceptionText());
+  }
+
+  @Override
+  public Map<File, Date> getDateTakenForFolder(File folder) {
+    throw new IllegalStateException(getNotImplementedExceptionText());
+  }
+
+  //
 
   @Override
   public int getOrientation(File image) {
@@ -99,35 +135,6 @@ public class ExtractorImageMetadataHandler extends ImageMetadataHandler {
     }
 
     return 0;
-  }
-
-  @Override
-  public Date getDateTaken(File image) {
-
-    try {
-      Metadata metadata = ImageMetadataReader.readMetadata(image);
-      Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-
-      if (directory != null) {
-        return directory.getDate(ExifIFD0Directory.TAG_DATETIME, TimeZone.getDefault());
-      }
-    }
-
-    catch (ImageProcessingException | IOException e) {
-      logger.error("could not get orientation", e);
-    }
-
-    return null;
-  }
-
-  @Override
-  public boolean setDateTaken(File image, Date date) {
-    throw new IllegalStateException(NOT_IMPLEMENTED_EXCEPTION_TEXT);
-  }
-
-  @Override
-  public Map<File, Date> getDateTakenForFolder(File folder) {
-    throw new IllegalStateException(NOT_IMPLEMENTED_EXCEPTION_TEXT);
   }
 
 }
