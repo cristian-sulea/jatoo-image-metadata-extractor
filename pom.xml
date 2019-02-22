@@ -5,12 +5,14 @@
   <parent>
     <groupId>net.sulea.cristian</groupId>
     <artifactId>jatoo</artifactId>
-    <relativePath>../jatoo/pom.xml</relativePath>
-    <version>5.0</version>
+    <!-- <relativePath>../jatoo/pom.xml</relativePath> -->
+    <version>5</version>
   </parent>
 
   <artifactId>jatoo-image-metadata-extractor</artifactId>
   <packaging>jar</packaging>
+
+  <version>5.0</version>
 
 
   <name>JaToo Image Metadata "metadata-extractor"</name>
@@ -43,12 +45,18 @@
   </scm>
 
 
+  <properties>
+    <skip.plugin.checkstyle>true</skip.plugin.checkstyle>
+    <skip.plugin.findbugs>true</skip.plugin.findbugs>
+    <skip.plugin.pmd>true</skip.plugin.pmd>
+  </properties>
+
+
   <dependencies>
 
     <dependency>
       <groupId>net.sulea.cristian</groupId>
       <artifactId>jatoo-image</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
